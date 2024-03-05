@@ -3,18 +3,15 @@ package com.example.examapp.database
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.examapp.model.Coordinates
 import com.example.examapp.model.Id
 import com.example.examapp.model.Location
 import com.example.examapp.model.Name
 import com.example.examapp.model.Picture
-import com.example.examapp.model.Street
-import java.sql.Date
 
 @Entity
 data class Persona(
-    @PrimaryKey(autoGenerate = false)
-    val seed: String,
+    @PrimaryKey(autoGenerate = true)
+    val idKey: Int = 0,
     @Embedded
     val name: Name,
     val gender: String,
@@ -27,7 +24,8 @@ data class Persona(
     @Embedded
     val picture: Picture? = null,
     @Embedded
-    val contact: Contact
+    val contact: Contact,
+    val nat: String
 )
 
 data class Contact(

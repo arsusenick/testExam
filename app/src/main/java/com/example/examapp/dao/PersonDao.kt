@@ -12,8 +12,14 @@ interface PersonDao {
     @Insert
     suspend fun insertPerson(persona: Persona)
 
-    @Query("SELECT * FROM persona ORDER BY seed ASC")
+    @Insert
+    suspend fun insertPersons(persons: List<Persona>)
+
+    @Query("SELECT * FROM persona ORDER BY idKey ASC")
     fun getPerson(): Flow<List<Persona>>
+
+    @Query("SELECT * FROM persona WHERE idKey = :personId")
+    suspend fun getPersonById(personId: Int): Persona
 
     @Query("DELETE FROM persona")
     suspend fun deleteAllPersons()

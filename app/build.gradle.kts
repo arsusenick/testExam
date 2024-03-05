@@ -68,6 +68,9 @@ dependencies {
     androidTestImplementation("androidx.room:room-testing:2.6.0")
     ksp("androidx.room:room-compiler:2.6.0")
 
+    //navigation
+    implementation(libs.androidx.navigation.compose)
+
     implementation(libs.picasso)
     implementation(libs.coil.compose)
 

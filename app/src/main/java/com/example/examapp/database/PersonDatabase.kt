@@ -17,7 +17,7 @@ abstract class PersonDatabase: RoomDatabase(){
             return Room.databaseBuilder(
                 context,
                 PersonDatabase::class.java,
-                "CoolName_DBa",
+                "CoolName1_DB",
             ).build()
         }
     }

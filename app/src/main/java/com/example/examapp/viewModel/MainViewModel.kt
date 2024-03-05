@@ -8,21 +8,19 @@ import android.os.Environment
 import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.ImageLoader
+import coil.request.ImageRequest
 import com.example.examapp.database.Contact
 import com.example.examapp.database.PersonDatabase
 import com.example.examapp.database.Persona
-import com.example.examapp.model.Coordinates
-import com.example.examapp.model.Id
-import com.example.examapp.model.Location
-import com.example.examapp.model.Name
 import com.example.examapp.model.Person
 import com.example.examapp.model.Picture
-import com.example.examapp.model.Street
 import com.example.examapp.repository.Repository
-import com.squareup.picasso.Picasso
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.File
@@ -32,40 +30,39 @@ class MainViewModel(private val repository: Repository, val database: PersonData
 
     val myResponse: MutableLiveData<Response<Person>> = MutableLiveData()
     var personCount = mutableIntStateOf(0)
-    val newSeed = mutableStateOf("")
-    val newName = mutableStateOf(Name("", "", ""))
-    val newGender = mutableStateOf("")
-    val newAge = mutableIntStateOf(0)
-    val newBirthDate = mutableStateOf("")
-    val newLocation = mutableStateOf(Location(Street("", ""), "", "", "", "", Coordinates(.0, .0)))
-    val newId = mutableStateOf(Id("",""))
-    val newPicture = mutableStateOf(Picture("",""))
-    val newContact = mutableStateOf(Contact("","",""))
-    fun insertItem() = viewModelScope.launch {
-        val persona = Persona(
-            seed = newSeed.value,
-            name = newName.value,
-            gender = newGender.value,
-            age = newAge.intValue,
-            birthDate = newBirthDate.value,
-            location = newLocation.value,
-            id = newId.value,
-            picture = newPicture.value,
-            contact = newContact.value
-        )
-        database.dao.insertPerson(persona)
-        newSeed.value = ""
-        newName.value = Name("", "", "")
-        newGender.value = ""
-        newAge.intValue = 0
-        newBirthDate.value = ""
-        newLocation.value = Location(Street("", ""), "", "", "", "", Coordinates(.0, .0))
-        newId.value = Id("","")
-        newPicture.value = Picture("","")
-        newContact.value = Contact("","","")
+    val newPersons = mutableStateOf<Person?>(null)
+
+    private var persons : MutableList<Persona> = ArrayList()
+
+    fun insertItems(context: Context) = viewModelScope.launch {
+        createDir(context)
+        newPersons.value!!.results.forEach{ person ->
+            val picName = person.picture.largePictureURL.substring(36)
+            val directory = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), picName)
+            downloadAndSaveImage(context, person.picture.largePictureURL, picName)
+            while(true){
+                delay(100)
+                if(directory.exists()){
+                    break
+                }
+            }
+            persons.add(
+                Persona(
+                    name = person.name,
+                    gender = person.gender,
+                    age = person.birth.age,
+                    birthDate = person.birth.date,
+                    location = person.location,
+                    id = person.documents,
+                    picture = Picture(directory.toString(), directory.toString()),
+                    contact = Contact(person.workPhone, person.selfPhone, person.email),
+                    nat = person.nat
+            ))
+        }
+        database.dao.insertPersons(persons)
+        persons = ArrayList()
         getCountPerson()
     }
-
     fun deleteAll() = viewModelScope.launch {
         database.dao.deleteAllPersons()
         getCountPerson()
@@ -75,39 +72,29 @@ class MainViewModel(private val repository: Repository, val database: PersonData
         personCount.intValue = database.dao.getCountOfElements()
     }
 
-    fun getPerson() {
+    fun getPerson(id: Int) {
         viewModelScope.launch {
-            val response = repository.getPerson()
+            val response = repository.getPerson(id)
             myResponse.value = response
         }
     }
 
-    fun downloadAndSaveImage(context: Context, imageUrl: String, fileName: String) {
-        createDir(context)
-        val target = object : com.squareup.picasso.Target {
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                bitmap?.let {
-                    val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName)
-                    try {
-                        val fos = FileOutputStream(file)
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
-                        fos.flush()
-                        fos.close()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
 
-            override fun onBitmapFailed(e: Exception?, errorDrawable: android.graphics.drawable.Drawable?) {
-                e?.printStackTrace()
-            }
+    fun downloadAndSaveImage(context: Context, url: String, fileName: String) = viewModelScope.launch{
+        val imageLoader = ImageLoader(context)
+        val request = ImageRequest.Builder(context)
+            .data(url)
+            .build()
 
-            override fun onPrepareLoad(placeHolderDrawable: android.graphics.drawable.Drawable?) {}
+        val result = imageLoader.execute(request).drawable
+        if (result is Drawable) {
+            val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName)
+            val fileOutputStream = FileOutputStream(file)
+            result.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+            fileOutputStream.close()
         }
-
-        Picasso.get().load(imageUrl).into(target)
     }
+
 
     private fun createDir(context: Context){
         val directory1 = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "women")
