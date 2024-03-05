@@ -25,7 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.examapp.database.Persona
 import com.example.examapp.model.Location
@@ -79,56 +81,41 @@ fun PersonScreen(
                     }"
                 )
                 Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth().padding(top = 15.dp))
-                val mod1 = Modifier
-                    .padding(top = 15.dp)
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())) {
-
-                    Column(mod1) {
-                        Text(text = "Национальность")
-                        Text(text = Country.getFullNameByAbbreviation(persona!!.nat))
-                    }
-                    Column(mod1) {
-                        Text(text = "Дата рождения")
-                        Text(text = getCleanDayOfBirth(persona!!.birthDate))
-                    }
-                    Column(mod1) {
-                        Text(text = "Место проживания")
-                        Text(text = getLocation(persona!!.location))
-                    }
-                    Column(mod1) {
-                        Text(text = "Рабочий телефон")
-                        Text(text = persona!!.contact.workPhone)
-                    }
-                    Column(mod1) {
-                        Text(text = "Личный телефон")
-                        Text(text = persona!!.contact.selfPhone)
-                    }
-                    Column(mod1) {
-                        Text(text = "Почта")
-                        Text(text = persona!!.contact.email)
-                    }
-                    Column(mod1) {
-                        Text(text = "Название документа")
-                        Text(text = when (persona!!.id?.name){
-                            "" -> "отсутствует информация"
-                            else -> persona!!.id?.name!!
-                        })
-                    }
-                    Column(mod1) {
-                        Text(text = "Номер документа")
-                        Text(text = when (persona!!.id?.value){
-                            null -> "отсутствует информация"
-                            else -> persona!!.id?.value!!
-                        })
-                    }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    InfoRow("Национальность", Country.getFullNameByAbbreviation(persona!!.nat))
+                    InfoRow("Дата рождения", getCleanDayOfBirth(persona!!.birthDate))
+                    InfoRow("Место проживания", getLocation(persona!!.location))
+                    InfoRow("Рабочий телефон", persona!!.contact.workPhone)
+                    InfoRow("Личный телефон", persona!!.contact.selfPhone)
+                    InfoRow("Почта", persona!!.contact.email)
+                    InfoRow("Название документа", when (persona!!.id?.name) {
+                        "" -> "отсутствует информация"
+                        else -> persona!!.id?.name!!
+                    })
+                    InfoRow("Номер документа", when (persona!!.id?.value) {
+                        null -> "отсутствует информация"
+                        else -> persona!!.id?.value!!
+                    })
                 }
+
             }
         }
     }
 
 }
+
+@Composable
+fun InfoRow(title: String, value: String) {
+    Column(Modifier.padding(top = 15.dp)) {
+        Text(text = title, fontSize = 10.sp, fontWeight = FontWeight(300))
+        Text(text = value)
+    }
+}
+
 
 fun getYearsString(years: Int): String {
     return when {

@@ -4,16 +4,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -25,9 +19,6 @@ import com.example.examapp.ui.screen.PersonsScreen
 import com.example.examapp.ui.theme.ExamAppTheme
 import com.example.examapp.viewModel.MainViewModel
 import com.example.examapp.viewModel.MainViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -52,51 +43,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             ExamAppTheme {
-                NavHost(navController = navController, startDestination = "PersonsScreen" ){
-                    composable("PersonsScreen"){
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            Box(modifier = Modifier.size(width = 200.dp, height = 100.dp)) {
-                                Button(onClick = {
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        viewModel.deleteAll()
-                                        viewModel.deleteAllFilesInDirectory(applicationContext)
-                                        viewModel.getPerson((6..12).random())
-                                    }
-                                }) {
-                                    Text("touch this")
-                                }
-                            }
-
-//                            Box(modifier = Modifier.size(width = 200.dp, height = 100.dp)) {
-//                                Button(modifier = Modifier.background(Color.Red), onClick = {
-//                                    CoroutineScope(Dispatchers.IO).launch {
-//                                        viewModel.deleteAll()
-//                                        viewModel.deleteAllFilesInDirectory(applicationContext)
-//                                    }
-////                                Log.d("13241","${viewModel.getCountPerson()}")
-//                                }) {
-//                                    Text(color = Color.White, text = "netouch this")
-//                                }
-//                            }
-
+                NavHost(navController = navController, startDestination = "PersonsScreen") {
+                    composable("PersonsScreen") {
                             viewModel.getCountPerson()
-                            PersonsScreen(viewModel = viewModel, navController = navController)
-                        }
+                            PersonsScreen(viewModel = viewModel, navController = navController, context = applicationContext)
                     }
-                    composable("PersonScreen/{id}") {backStackEntry ->
+                    composable("PersonScreen/{id}") { backStackEntry ->
                         val id = backStackEntry.arguments?.getString("id")
                         PersonScreen(viewModel = viewModel, id = id!!)
                     }
                 }
-                // A surface container using the 'background' color from the theme
-
-
-
-
-                }
             }
         }
     }
+}
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {

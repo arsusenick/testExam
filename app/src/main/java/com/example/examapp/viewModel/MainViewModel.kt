@@ -21,6 +21,8 @@ import com.example.examapp.model.Person
 import com.example.examapp.model.Picture
 import com.example.examapp.repository.Repository
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.File
@@ -28,6 +30,8 @@ import java.io.FileOutputStream
 
 class MainViewModel(private val repository: Repository, val database: PersonDatabase) :ViewModel() {
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
     val myResponse: MutableLiveData<Response<Person>> = MutableLiveData()
     var personCount = mutableIntStateOf(0)
     val newPersons = mutableStateOf<Person?>(null)
@@ -35,6 +39,8 @@ class MainViewModel(private val repository: Repository, val database: PersonData
     private var persons : MutableList<Persona> = ArrayList()
 
     fun insertItems(context: Context) = viewModelScope.launch {
+        _isLoading.value = true
+
         createDir(context)
         newPersons.value!!.results.forEach{ person ->
             val picName = person.picture.largePictureURL.substring(36)
@@ -62,6 +68,7 @@ class MainViewModel(private val repository: Repository, val database: PersonData
         database.dao.insertPersons(persons)
         persons = ArrayList()
         getCountPerson()
+        _isLoading.value = false
     }
     fun deleteAll() = viewModelScope.launch {
         database.dao.deleteAllPersons()

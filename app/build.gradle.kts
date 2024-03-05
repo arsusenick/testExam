@@ -65,6 +65,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.0")
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.material)
     androidTestImplementation("androidx.room:room-testing:2.6.0")
     ksp("androidx.room:room-compiler:2.6.0")
 
@@ -73,6 +74,8 @@ dependencies {
 
     implementation(libs.picasso)
     implementation(libs.coil.compose)
+
+
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
