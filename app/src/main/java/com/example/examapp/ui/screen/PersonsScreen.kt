@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -19,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.examapp.util.Constants.Companion.PADDING_SPACING
 import com.example.examapp.viewModel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,8 +45,7 @@ fun PersonsScreen(
         .fillMaxSize()
         .pullRefresh(pullRefreshState)) {
         LazyColumn(modifier = Modifier
-            .fillMaxSize()
-            .padding(top = PADDING_SPACING),
+            .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(20.dp),
             content = {
                 when (allObjects.size) {
