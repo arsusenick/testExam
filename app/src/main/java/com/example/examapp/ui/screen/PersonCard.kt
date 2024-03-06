@@ -1,6 +1,5 @@
 package com.example.examapp.ui.screen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,26 +20,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.examapp.database.Persona
 
 @Composable
 fun PersonCard(
     person: Persona,
-    navController: NavController
+    navClick: () -> Unit,
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .clickable {
-            Log.d("asedasdfgdsag", "privet ${person.idKey}")
-            navController.navigate("PersonScreen/${person.idKey}")
-        }, verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { navClick() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Box(
             modifier = Modifier
                 .width((screenWidth * 0.3f).dp)
-                .height((screenWidth * 0.3f).dp )
+                .height((screenWidth * 0.3f).dp)
         ) {
             Image(
                 painter = rememberAsyncImagePainter(person.picture?.largePictureURL),

@@ -47,7 +47,6 @@ fun PersonScreen(
     context: Context
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    Log.d("asedasdfgdsag", "$id")
     var persona by remember {
         mutableStateOf<Persona?>(null)
     }
@@ -61,7 +60,6 @@ fun PersonScreen(
         ) {
             Image(
                 painter = rememberAsyncImagePainter(model = persona?.picture?.largePictureURL),
-//            painter = rememberAsyncImagePainter(model = null),
                 contentDescription = "",
                 modifier = Modifier
                     .width((screenWidth * 0.65f).dp)
@@ -94,7 +92,6 @@ fun PersonScreen(
                     InfoRow("Дата рождения", getCleanDayOfBirth(persona!!.birthDate))
                     InfoRow("Место проживания", getLocation(persona!!.location), modifier = Modifier.clickable {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
-//                            data = Uri.parse("geo:${persona!!.location.coordinates.latitude},${persona!!.location.coordinates.longitude}")
                             data = Uri.parse("geo:0,0?q=${persona!!.location.coordinates.latitude},${persona!!.location.coordinates.longitude}(метка)")
                             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         }

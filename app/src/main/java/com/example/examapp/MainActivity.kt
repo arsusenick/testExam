@@ -2,6 +2,7 @@ package com.example.examapp
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.Observer
@@ -31,10 +32,10 @@ class MainActivity : ComponentActivity() {
                 viewModel.newPersons.value = response.body()
                 viewModel.insertItems(applicationContext)
             } else {
+                Toast.makeText(applicationContext, "Ошибка на сервере", Toast.LENGTH_SHORT).show()
                 Log.d("wertyuiop", response.errorBody().toString())
                 Log.d("wertyuiop", response.code().toString())
             }
-
         })
         setContent {
             val navController = rememberNavController()

@@ -1,11 +1,13 @@
 package com.example.examapp.viewModel
 
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.graphics.drawable.toBitmap
@@ -39,8 +41,8 @@ class MainViewModel(private val repository: Repository, val database: PersonData
     private var persons : MutableList<Persona> = ArrayList()
 
     fun insertItems(context: Context) = viewModelScope.launch {
-        _isLoading.value = true
-
+        deleteAll()
+        deleteAllFilesInDirectory(context)
         createDir(context)
         newPersons.value!!.results.forEach{ person ->
             val picName = person.picture.largePictureURL.substring(36)
@@ -79,10 +81,17 @@ class MainViewModel(private val repository: Repository, val database: PersonData
         personCount.intValue = database.dao.getCountOfElements()
     }
 
-    fun getPerson(id: Int) {
+    @SuppressLint("ShowToast")
+    fun getPerson(id: Int, context: Context) {
         viewModelScope.launch {
-            val response = repository.getPerson(id)
-            myResponse.value = response
+            try {
+                _isLoading.value = true
+                val response = repository.getPerson(id)
+                myResponse.value = response
+            }catch (e: Exception){
+                Toast.makeText(context, "Ошибка соединения", Toast.LENGTH_SHORT).show()
+                _isLoading.value = false
+            }
         }
     }
 

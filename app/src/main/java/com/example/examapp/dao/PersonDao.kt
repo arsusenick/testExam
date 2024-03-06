@@ -10,9 +10,6 @@ import kotlinx.coroutines.flow.Flow
 interface PersonDao {
 
     @Insert
-    suspend fun insertPerson(persona: Persona)
-
-    @Insert
     suspend fun insertPersons(persons: List<Persona>)
 
     @Query("SELECT * FROM persona ORDER BY idKey ASC")
